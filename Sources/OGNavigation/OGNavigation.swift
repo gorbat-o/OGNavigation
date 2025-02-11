@@ -53,21 +53,24 @@ public final class NavigationRouter<T: NavigationRoute>: Identifiable {
     }
 
     deinit {
-        if onDismissCount == 0 {
-            onDismissCount += 1
-            onDismiss?()
-            debugPrint("NavigationRouter deinitialized -> onDismiss called")
-        } else {
-            debugPrint("NavigationRouter deinitialized -> onDismiss not called")
-        }
-        debugPrint("NavigationRouter deinitialized")
+//        if onDismissCount == 0 {
+//            onDismissCount += 1
+//            onDismiss?()
+////            debugPrint("NavigationRouter deinitialized -> onDismiss called")
+//        }
+//        else {
+//            debugPrint("NavigationRouter deinitialized -> onDismiss not called")
+//        }
+//        debugPrint("NavigationRouter deinitialized")
     }
 
+    @MainActor
     func updateRoot(_ route: T) {
         root = route
         routes.removeAll()
     }
 
+    @MainActor
     public func present(
         _ route: T,
         inTab: T? = nil,
@@ -94,6 +97,7 @@ public final class NavigationRouter<T: NavigationRoute>: Identifiable {
         }
     }
 
+    @MainActor
     public func dismiss(_ option: NavigationPresentationOption? = nil) {
         switch option {
         case .fullscreenCover, .sheet, .popover:
@@ -117,12 +121,14 @@ public final class NavigationRouter<T: NavigationRoute>: Identifiable {
         onDismiss?()
     }
 
+    @MainActor
     public func handleDeeplink(url: URL) {
         if let (route, option) = deeplinkHandler?.handleDeeplink(url: url) {
             present(route, option: option)
         }
     }
 
+    @MainActor
     private func createAndPresent(_ route: T, option: NavigationPresentationOption, onDismiss: (() -> Void)?) {
         let newRouter = NavigationRouter(root: route, deeplinkHandler: deeplinkHandler)
         newRouter.onDismiss = onDismiss
@@ -130,10 +136,12 @@ public final class NavigationRouter<T: NavigationRoute>: Identifiable {
         presentedItem = NavigationPresentedItem(router: newRouter, option: option)
     }
 
+    @MainActor
     private func push(_ route: T) {
         routes.append(route)
     }
 
+    @MainActor
     private func pop() {
         if !routes.isEmpty { routes.removeLast() }
     }
@@ -151,10 +159,12 @@ public final class NavigationTabRouter<T: NavigationRoute> {
         self.routers = tabs.map { NavigationRouter<T>(root: $0, deeplinkHandler: deeplinkHandler) }
     }
 
+    @MainActor
     public func updateSelectedTab(_ to: T) {
         selected = to
     }
 
+    @MainActor
     public func present(
         _ route: T,
         inTab: T? = nil,
@@ -174,6 +184,7 @@ public final class NavigationTabRouter<T: NavigationRoute> {
         }
     }
 
+    @MainActor
     public func resetToRoot(for tab: T) {
         if let idx = tabs.firstIndex(of: tab) {
             while !routers[idx].routes.isEmpty {

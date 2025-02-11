@@ -45,7 +45,9 @@ struct SettingsView: View {
                     .font(.subheadline)
                 Button("Trigger") {
                     tabRouter.present(.profile, option: .sheet, onDismiss: {
-                        tabRouter.present(.dataDetail(id: 0), option: .sheet)
+                        tabRouter.present(.settingsTab, option: .sheet, onDismiss: {
+                            tabRouter.present(.profile, option: .sheet)
+                        })
                     })
                 }
                 .buttonStyle(OGButtonStyle())
@@ -56,7 +58,9 @@ struct SettingsView: View {
                     .font(.subheadline)
                 Button("Trigger") {
                     tabRouter.present(.profile, option: .popover, onDismiss: {
-                        tabRouter.present(.dataDetail(id: 0), option: .popover)
+                        tabRouter.present(.dataDetail(id: 0), option: .popover, onDismiss: {
+                            tabRouter.present(.profile, option: .popover)
+                        })
                     })
                 }
                 .buttonStyle(OGButtonStyle())
